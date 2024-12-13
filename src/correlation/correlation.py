@@ -32,3 +32,18 @@ def calculate(asset1, asset2):
 
     classification = classify(correlation)
     return {'correlation':  correlation, 'result': classification}
+
+def calculate_for_wallet(wallet, stocks_under_evaluation):
+    results = []
+
+    for stock_wallet in wallet:
+        for stock_eval in stocks_under_evaluation:
+            corr_value = calculate(stock_wallet, stock_eval)
+            results.append({
+                'Stock_Wallet': stock_wallet,
+                'Stock_Eval': stock_eval,
+                'Correlation': corr_value['correlation'],
+                'Result': corr_value['result']
+            })
+
+    return pd.DataFrame(results)
