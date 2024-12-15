@@ -13,5 +13,5 @@ def verify_file_data(start_date, end_date, history):
     return outdated_file, start_date
 
 
-def build_file_name(asset):
-    return f"csv_files/{asset.lower()}_historical_data.csv"
+def build_file_name(asset, sufix):
+    return f"csv_files/{asset.lower()}_{sufix}.csv"

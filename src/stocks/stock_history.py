@@ -39,7 +39,7 @@ def get_history(asset):
     end_date = datetime.today()
     start_date = end_date - timedelta(days=INTERVAL_DAYS)
     
-    file = csv_files.build_file_name(asset)
+    file = csv_files.build_file_name(asset, "historical_data")
     
     if(os.path.exists(file)):
         print('retornando arquivo local: ', file)
