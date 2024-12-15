@@ -10,14 +10,14 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from helpers import csv_files
 
+file_name = csv_files.build_file_name("ranking_bazin", datetime.now().strftime("%Y-%m-%d"))
+
 def fetch_financial_data(ticker):
     if ticker.endswith("34"):
         print(f"BDR detectado: {ticker} - Ignorando...")
         return None
 
     try:
-        print(f"obtentado dados de {ticker}")
-
         stock = yf.Ticker(f"{ticker}.SA")
         info = stock.info
 
@@ -70,8 +70,6 @@ def remove_duplicate_ticker_base(df):
 def order_by_ev_ebitda(df):
     return df.sort_values(by="EV/EBITDA", ascending=True)
 
-def save_file():
-    csv_files.build_file_name("ranking_bazin", datetime.now().strftime("%Y-%m-%d"))
 
 def log_warnings():
     print("\n\nATENÇÃO!!!")
@@ -82,7 +80,17 @@ def log_warnings():
 
 
 def process_formula(tickers):
-    data = [fetch_financial_data(ticker) for ticker in tickers]
+    if(os.path.exists(file_name)):
+        print('retornando arquivo local: ', file_name)
+        return pd.read_csv(file_name)
+
+    total_tickers = len(tickers)
+    data = []
+
+    for index, ticker in enumerate(tickers, start=1):
+        print(f"Processando item: {ticker} - {index} de {total_tickers}")
+        data.append(fetch_financial_data(ticker))
+    
     df = pd.DataFrame(filter(None, data))
     
     df = get_stocks_with_greater_liquidity(df)
@@ -90,6 +98,7 @@ def process_formula(tickers):
     df = order_by_ev_ebitda(df)
     df = add_ticker_base_column(df)
     df = remove_duplicate_ticker_base(df)
+    df.to_csv(file_name, index=False)
+    
     log_warnings()
-    save_file()
     return df
