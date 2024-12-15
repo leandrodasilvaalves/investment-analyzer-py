@@ -4,7 +4,7 @@ import pandas as pd
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from history import stock_history
+from stocks import stock_history
 
 def classify(correlation):
     if correlation <= -0.7:
