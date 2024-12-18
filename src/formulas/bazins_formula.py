@@ -27,6 +27,7 @@ def fetch_financial_data(ticker):
         ebitda = info.get("ebitda", np.nan)
         avg_volume_10d = info.get("averageDailyVolume10Day", np.nan)
         sector = info.get("sector", "Unknown")
+        dividendYield =  stock.info.get("dividendYield", 0) * 100
 
         enterprise_value = calculate_ev(market_cap, debt, cash)
         ev_ebitda = caculdate_ev_ebitda(enterprise_value, ebitda)
@@ -41,6 +42,7 @@ def fetch_financial_data(ticker):
             "EV/EBITDA": ev_ebitda,
             "Avg Volume 10D": avg_volume_10d,
             "Sector": sector,
+            "Dividend Yield": dividendYield,
         }
     except Exception as e:
         print(f"Erro ao buscar dados para {ticker}: {e}")
@@ -70,6 +72,11 @@ def remove_duplicate_ticker_base(df):
 def order_by_ev_ebitda(df):
     return df.sort_values(by="EV/EBITDA", ascending=True)
 
+def calculate_fair_price(df):
+    discount_rate = 0.06  # 6%, valor padrão usado por Bazin
+    df["Annual Dividend"] = df["Market Cap"] * (df["Dividend Yield"] / 100)
+    df["Fair Price"] = df["Annual Dividend"] / discount_rate
+    return df
 
 def log_warnings():
     print("\n\nATENÇÃO!!!")
@@ -98,6 +105,7 @@ def process_formula(tickers):
     df = order_by_ev_ebitda(df)
     df = add_ticker_base_column(df)
     df = remove_duplicate_ticker_base(df)
+    df = calculate_fair_price(df)
     df.to_csv(file_name, index=False)
     
     log_warnings()
