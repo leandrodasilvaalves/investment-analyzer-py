@@ -77,3 +77,4 @@ logs/
 *.swo
 *~
 csv_files/
+.venv
